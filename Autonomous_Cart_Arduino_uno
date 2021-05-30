@@ -1,0 +1,224 @@
+#define Motor_Left_in_01    3                                                            //defining const. variable named "in1" with value 0, which refers to the PICO D0.                  
+#define Motor_Left_in_02    4                                                           //defining const. variable named "in2" with value 1, which refers to the PICO D1.                  
+
+#define Motor_Right_in_01   6                                                           //defining const. variable named "in3" with value 2, which refers to the PICO D2.                  
+#define Motor_Right_in_02   7                                                           //defining const. variable named "in4" with value 3, which refers to the PICO D3.    
+              
+#define Motor_Left_En       2                  
+#define Motor_Right_En      5 
+
+#define BuzzerOutputPin     8
+
+#define Front_Right_Sen     9
+#define Front_Left_Sen      10
+
+#define Rear_Right_Sen      11
+#define Rear_Left_Sen       12
+
+
+                
+char val;      
+
+void Forward_Run(void) 
+{                  
+ digitalWrite(Motor_Left_in_01, HIGH);                  
+ digitalWrite(Motor_Left_in_02, LOW); 
+
+ digitalWrite(Motor_Right_in_01, HIGH); 
+ digitalWrite(Motor_Right_in_02, LOW);
+                
+ digitalWrite(Motor_Left_En, HIGH);
+ digitalWrite(Motor_Right_En, HIGH);  
+ //delay(500);                  
+} 
+
+void Backward_Run( void )                 
+{                  
+ digitalWrite(Motor_Left_in_01, LOW);                  
+ digitalWrite(Motor_Left_in_02, HIGH); 
+
+ digitalWrite(Motor_Right_in_01, LOW); 
+ digitalWrite(Motor_Right_in_02, HIGH);
+                
+ digitalWrite(Motor_Left_En, HIGH);
+ digitalWrite(Motor_Right_En, HIGH); 
+ //delay(500);                   
+}                 
+            
+void Left_Turn( void ) 
+{                  
+ digitalWrite(Motor_Left_in_01, LOW);                  
+ digitalWrite(Motor_Left_in_02, LOW); 
+
+ digitalWrite(Motor_Right_in_01, LOW); 
+ digitalWrite(Motor_Right_in_02, HIGH);
+                
+ digitalWrite(Motor_Left_En, LOW);
+ digitalWrite(Motor_Right_En, HIGH);  
+// delay(400);                   
+}               
+               
+void Right_Turn( void ) 
+{                  
+ digitalWrite(Motor_Left_in_01, LOW);                  
+ digitalWrite(Motor_Left_in_02, HIGH); 
+
+ digitalWrite(Motor_Right_in_01, LOW); 
+ digitalWrite(Motor_Right_in_02, LOW);
+                
+ digitalWrite(Motor_Left_En, HIGH);
+ digitalWrite(Motor_Right_En, LOW);     
+ 
+// delay(400);              
+}               
+               
+void Stop_Cart(void) 
+{                  
+ digitalWrite(Motor_Left_in_01, LOW);                  
+ digitalWrite(Motor_Left_in_02, LOW); 
+
+ digitalWrite(Motor_Right_in_01, LOW); 
+ digitalWrite(Motor_Right_in_02, LOW);
+                
+ digitalWrite(Motor_Left_En, LOW);
+ digitalWrite(Motor_Right_En, LOW);                  
+}   
+
+void Beep_Sound(int times)
+{   
+    int i;
+  for(i=0;i<times;i++);
+  digitalWrite(BuzzerOutputPin, HIGH); 
+  delay(100);
+  digitalWrite(BuzzerOutputPin, LOW); 
+  delay(100);
+}
+
+
+
+             
+void setup() {     
+
+
+pinMode(2, OUTPUT) ;
+pinMode(3, OUTPUT) ;
+pinMode(4, OUTPUT) ;
+pinMode(5, OUTPUT) ;
+pinMode(6, OUTPUT) ;
+pinMode(7, OUTPUT) ;
+pinMode(8, OUTPUT) ;
+
+pinMode(9, INPUT) ;
+pinMode(10, INPUT) ;
+pinMode(11, INPUT) ;
+pinMode(12, INPUT) ;
+
+              
+ Serial.begin(9600);                  
+ Serial.println("Please enter 'f' to run the motor FORWARD, or 'b' to run the motor BACKWARD");                  
+ Serial.println("or 'r' to run the motor RIGHT, or 'l' to run the motor LEFT, or 's' to STOP all motors. ");                  
+}                 
+             
+void loop() { 
+
+  int   Front_Right_Sen1, Front_Left_Sen1, Rear_Right_Sen1, Rear_Left_Sen1;
+  
+  while(1)
+  {
+
+
+  Front_Right_Sen1 = digitalRead(Front_Right_Sen);
+  Front_Left_Sen1  = digitalRead(Front_Left_Sen);
+  Rear_Right_Sen1  = digitalRead(Rear_Right_Sen);
+  Rear_Left_Sen1   = digitalRead(Rear_Left_Sen);
+
+  
+ if ( Front_Right_Sen1 == LOW &&  Front_Left_Sen1 == LOW)
+   {
+    Backward_Run();
+    delay(800);
+    Beep_Sound(4);
+   }
+    else if ( Front_Right_Sen1 == LOW &&  Front_Left_Sen1 == HIGH )
+   {
+    Backward_Run();
+    delay(1000);
+    Left_Turn();
+    delay(800);
+    Beep_Sound(4);
+   }
+       else if ( Front_Right_Sen1 == HIGH &&  Front_Left_Sen1 == LOW) 
+   {
+    Backward_Run();
+    delay(1000);
+    Right_Turn();
+    Beep_Sound(4);
+   }
+   
+   else if ( Rear_Right_Sen1 == LOW &&  Rear_Left_Sen1 == LOW)
+   {
+    Forward_Run();
+    delay(800);
+    Beep_Sound(4);
+   }
+       else if ( Rear_Right_Sen1 == LOW &&  Rear_Left_Sen1 == HIGH )
+   {
+    Forward_Run();
+    delay(1000);;
+    Left_Turn();
+    delay(800);
+    Beep_Sound(4);
+   }
+  else if ( Rear_Right_Sen1 == HIGH &&  Rear_Left_Sen1 == LOW) 
+   {
+    Forward_Run();
+    delay(1000);
+    Right_Turn();
+    delay(800);
+    Beep_Sound(4);
+   }
+   else if ( Rear_Right_Sen1 == HIGH &&  Rear_Left_Sen1 == HIGH && Front_Right_Sen1 == HIGH &&  Front_Left_Sen1 == HIGH)
+   {
+    Backward_Run();
+    delay(500);
+ //   Beep_Sound(4);
+   }
+  else if ( Rear_Right_Sen1 == LOW &&  Rear_Left_Sen1 == LOW && Front_Right_Sen1 == LOW &&  Front_Left_Sen1 == LOW)
+   {
+    Stop_Cart();
+    delay(500);
+   Beep_Sound(4);
+   }
+  }
+
+
+  
+/* if (Serial.available() > 0) {                  
+   val = Serial.read();                  
+ }                  
+ if (val == 'f') {                  
+   forward(in1, in2, 255, motorASpeedPin);                  
+   forward(in3, in4, 255, motorBSpeedPin);                  
+   Serial.println("forward");                  
+ }                  
+ if (val == 'b') {                  
+   backward(in1, in2, 255, motorASpeedPin);                  
+   backward(in3, in4, 255, motorBSpeedPin);                  
+   Serial.println("backward");                  
+ }                  
+ if (val == 'r') {                  
+   right(255);                  
+   Serial.println("right");                  
+ }                  
+ if (val == 'l') {                  
+   left(255);                  
+   Serial.println("left");                  
+ }                  
+ if (val == 's') {                  
+   stopAll();                  
+   Serial.println("stopAll");                  
+ } */
+
+}                
+                
+    
